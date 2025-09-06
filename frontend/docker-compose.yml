@@ -1,0 +1,7 @@
+services:
+  frontend:
+    build: .
+    ports:
+      - "3250:3250"
+    volumes:
+      - .:/usr/src/app

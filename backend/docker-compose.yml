@@ -8,20 +8,21 @@ services:
     command: redis-server --appendonly yes --replica-read-only no
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "6379:6379"
     env_file:
       - ./.env
     volumes:
-      - ".data/redis:/data"
+      - redis_data:/data
+    networks:
+      - panel_ziro
 
-  # database containers, one for each db
   pg_fixPermissions:
     image: "bitnami/postgresql:14"
     user: root
     command: chown -R 1001:1001 /bitnami/postgresql
     volumes:
-      - ".data/pg:/bitnami/postgresql/data"
+      - pg_data:/bitnami/postgresql/data
+    networks:
+      - panel_ziro
 
   postgres:
     image: "bitnami/postgresql:14"
@@ -32,25 +33,24 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ".data/pg:/bitnami/postgresql/data"
-    ports:
-      - "5432:5432"
+      - pg_data:/bitnami/postgresql/data
     depends_on:
       - pg_fixPermissions
+    networks:
+      - panel_ziro
 
   rabbitmq:
     image: rabbitmq:3-management
     hostname: rabbitmq
-    container_name: "rabbitmq"
+    container_name: "rabbitmq_ziro"
     restart: always
     env_file:
       - ./.env
     volumes:
-      - .data/rabbitmq/data/:/var/lib/rabbitmq/
-      - .data/rabbitmq/logs/:/var/log/rabbitmq/log
-    ports:
-      - 5672:5672
-      - 15672:15672
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_logs:/var/log/rabbitmq/log
+    networks:
+      - panel_ziro
 
   api:
     build:
@@ -71,5 +71,19 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - .data/.wwebjs_auth:/app/.wwebjs_auth
-      - .data/medias:/app/public
+      - wwebjs_auth:/app/.wwebjs_auth
+      - medias:/app/public
+    networks:
+      - panel_ziro
+
+networks:
+  panel_ziro:
+    driver: bridge
+
+volumes:
+  redis_data:
+  pg_data:
+  rabbitmq_data:
+  rabbitmq_logs:
+  wwebjs_auth:
+  medias:

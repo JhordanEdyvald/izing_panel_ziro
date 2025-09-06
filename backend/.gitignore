@@ -33,3 +33,5 @@ newrelic_agent.log
 .data/
 reports/report.json
 reports/report.html
+
+*.ignore

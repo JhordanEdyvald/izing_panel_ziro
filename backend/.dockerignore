@@ -19,3 +19,4 @@ DockerfileARM
 logs
 public
 .wwebjs_auth
+*.ignore

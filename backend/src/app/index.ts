@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import "reflect-metadata";
 import "express-async-errors";
+import cors from "cors";
 import "./config-env";
 import { createServer } from "http";
 import { env } from "process";
@@ -14,6 +15,8 @@ import { StartAllWhatsAppsSessions } from "../services/WbotServices/StartAllWhat
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default async function application() {
   const app: any = express();
+
+  app.use(cors());
   const httpServer: any = createServer(app);
   const port = app.get("port") || env.PORT || 3100;
 
